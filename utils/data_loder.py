@@ -8,7 +8,7 @@ import cv2
 
 class MetaDataLoader(data.Dataset):
     def __init__(self, config, 
-                 x_imgs, y_meta,
+                 x1, x2, y,
                  transform=None,
                  valid=None):
         self.width = config.width
@@ -23,15 +23,19 @@ class MetaDataLoader(data.Dataset):
         #y_metas.sort()
         #y_metas = [os.path.join(y_meta, path) for path in y_metas]
         if valid:
-            self.y_metas = np.load(y_meta)
-            self.x_imgs = np.load(x_imgs)
+            self.y_label = np.load(y)[:200]
+            x1 = np.load(x1)[:200]
+            x2 = np.load(x2)[:200]
+            self.x1, self.x2 = np.flip(x1), np.flip(x2)
         else:
-            self.y_metas = np.load(y_meta)
-            self.x_imgs = np.load(x_imgs)
-        assert (len(self.y_metas) == len(self.x_imgs))
+            self.y_label = np.load(y)[:200]
+            self.x1 = np.load(x1)[:200]
+            self.x2 = np.load(x2)[:200]
+        assert (len(self.y_label) == len(self.x1))
+        assert (len(self.y_label) == len(self.x2))
 
     def __len__(self):
-        return len(self.x_imgs)
+        return len(self.x1)
 
     def __getitem__(self, index):
         """
@@ -40,17 +44,20 @@ class MetaDataLoader(data.Dataset):
         Returns:
             tuple: (image, target) where target is the image segmentation.
         """
-        x_img = self.x_imgs[index]
+        x1 = self.x1[index]
+        x2 = self.x2[index]
         #x_img = cv2.cvtColor(x_img, cv2.COLOR_BGR2RGB)
-        x_img = x_img.astype(np.float32)/255
+        x1 = x1.reshape(self.width, self.height, 1).astype(np.float32)/255
+        x2 = x2.reshape(self.width, self.height, 1).astype(np.float32)/255
         #x_img = torch.as_tensor(x_img.copy()).float().contiguous()
 
-        y_labels = self.y_metas[index]
-        print(y_labels)
-        y_labels = torch.as_tensor(y_labels.copy()).int().contiguous()
+        y_labels = self.y_label[index]
+        y_labels = torch.as_tensor(y_labels.copy())
         #y_labels = torch.nn.functional.one_hot(y_labels, num_classes=self.classes)
         if self.transform is not None:
-            x_img = self.transform(x_img)
-        return x_img, y_labels
+            x1 = self.transform(x1)
+            x2 = self.transform(x2)
+        return x1, x2, y_labels
+
 
 

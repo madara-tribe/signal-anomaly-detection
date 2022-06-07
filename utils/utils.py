@@ -13,8 +13,12 @@ def create_binary_mask(pred, threshold=0.1):
     #print(np.unique(markers))
     return markers
 
-def save_in_progress(img, nums):
-    img = img[0].detach().cpu().numpy()
-    img = (img * 255).transpose(1, 2, 0)
+def save_in_progress(img1, img2, nums):
+    img1 = img1[0].detach().cpu().numpy()
+    img1 = (img1 * 255).transpose(1, 2, 0)
+    img2 = img2[0].detach().cpu().numpy()
+    img2 = (img2 * 255).transpose(1, 2, 0)
+    img = np.hstack([img1, img2])
     os.makedirs('InProgress', exist_ok=True)
     cv2.imwrite("InProgress/pred_rgb_{}.png".format(nums), img.astype(np.uint8))
+
