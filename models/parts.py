@@ -18,23 +18,38 @@ class double_conv(nn.Module):
         return x
 
 
-def attention_net(lstm_output, final_state):
-    lstm_output = lstm_output.permute(1, 0, 2)
-    hidden = final_state.squeeze(0)
-    attn_weights = torch.bmm(lstm_output, hidden.unsqueeze(2)).squeeze(2)
-    soft_attn_weights = F.softmax(attn_weights, dim=1)
-    new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
-                                 soft_attn_weights.unsqueeze(2)).squeeze(2)
-    return new_hidden_state
 
+class CNNEncorder(nn.Module):
+    def __init__(self, inc, start_fm):
+        super(CNNEncorder, self).__init__()
+        self.double_conv1 = double_conv(inc, start_fm)
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
+        self.double_conv2 = double_conv(start_fm, start_fm * 2)
+        #Max Pooling 2
+        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
+        #Convolution 3
+        self.double_conv3 = double_conv(start_fm * 2, start_fm * 4)
+        #Max Pooling 3
+        self.maxpool3 = nn.MaxPool2d(kernel_size=2)
+        #Convolution 4
+        self.double_conv4 = double_conv(start_fm * 4, start_fm * 8)
+        
+        self.maxpool4 = nn.MaxPool2d(kernel_size=2)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
+        
+    def forward(self, x):
+        x = self.double_conv1(x)
+        x = self.maxpool1(x)
 
+        x = self.double_conv2(x)
+        x = self.maxpool2(x)
 
-def attention(lstm_output, final_state):
-    lstm_output = lstm_output.permute(1, 0, 2)
-    merged_state = torch.cat([s for s in final_state], 1)
-    merged_state = merged_state.squeeze(0).unsqueeze(2)
-    weights = torch.bmm(lstm_output, merged_state)
-    weights = F.softmax(weights.squeeze(2), dim=1).unsqueeze(2)
-    return torch.bmm(torch.transpose(lstm_output, 1, 2), weights).squeeze(2)
+        x = self.double_conv3(x)
+        x = self.maxpool3(x)
+
+        x = self.double_conv4(x)
+        x = self.maxpool4(x) # torch.Size([1, 512, 14, 14])
+        return self.avgpool(x) # torch.Size([1, 512, 1, 1])
+
 
 
