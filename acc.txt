@@ -1,0 +1,7 @@
+root@541a3b4c2594:/home/app/coco/exp1# python3 predict.py 21
+loaded trained model
+Val set: 1138
+predicting  .....
+100%|███████████████████████████████████████| 1138/1138 [00:30<00:00, 36.98it/s]
+shape accuracy is 0.45782073813708263
+color accuracy is 0.5817223198594025
