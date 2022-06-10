@@ -1,0 +1,7 @@
+root@541a3b4c2594:/home/app/coco/CNNLATM-attn# python3 predict.py 18
+loaded trained model
+Val set: 1138
+predicting  .....
+100%|███████████████████████████████████████| 1138/1138 [00:26<00:00, 43.40it/s]
+shape accuracy is 0.9973637961335676
+color accuracy is 0.1704745166959578
