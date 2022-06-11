@@ -10,7 +10,6 @@ import torch.nn.functional as F
 from torch.utils import data
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.transforms as transforms
-from torchinfo import summary
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
 from cfg import Cfg
@@ -19,13 +18,13 @@ from models import LSTM_with_atten
 from utils import utils
 from utils.optimizer import create_optimizer
 from utils.scheduler import CosineWithRestarts
-from utils.loss import one_hot_loss
-H = W = 224
+from utils.loss import OneHotLoss
 
 class Trainer:
     def __init__(self, config):
         self.tfwriter = SummaryWriter(log_dir=config.TRAIN_TENSORBOARD_DIR)
-        self.loss = nn.CrossEntropyLoss()
+        self.criterion = OneHotLoss()
+
     def call_data_loader(self, config, num_worker):
         """ Dataset And Augmentation
         if -1 ~ 1 normalize, use two:
@@ -48,7 +47,6 @@ class Trainer:
         self.train_dst = MetaDataLoader(config, transform=train_transform, valid=None)
         self.val_dst = MetaDataLoader(config, transform=val_transform, valid=True)
         
-        
         print("Train set: %d, Val set: %d" %(len(self.train_dst), len(self.val_dst)))
         train_loader = data.DataLoader(self.train_dst, batch_size=config.train_batch, shuffle=True, num_workers=num_worker, pin_memory=True)
         val_loader = data.DataLoader(self.val_dst, batch_size=config.val_batch, shuffle=True, num_workers=0, pin_memory=None)
@@ -56,25 +54,23 @@ class Trainer:
         return train_loader, val_loader
 
 
-    def validate(self, val_loader, color_model, shape_model, global_step, epoch, device):
+    def validate(self, config, val_loader, model, global_step, epoch, device):
         interval_valloss, vc, vs = 0, 0, 0
         nums = 0
-        color_model.eval()
-        shape_model.eval()
+        model.eval()
         print("validating .....")
         with torch.no_grad():
             for val_x1, val_x2, val_y1, val_y2 in tqdm(val_loader):
                 val_x1 = val_x1.to(device=device, dtype=torch.float32)
                 val_x2 = val_x2.to(device=device, dtype=torch.float32)
                 val_y1 = val_y1.to(device=device, dtype=torch.long)
-                val_y2 = val_y2.to(device=device, dtype=torch.long) #.unsqueeze(0)
+                val_y2 = val_y2.to(device=device, dtype=torch.long)
                 # predict valid
-                val_color = color_model(val_x1)
-                val_shape = shape_model(val_x2)
+                val_color, val_shape = model(val_x1, val_x2)
                 
                 # val loss update
-                val_color_loss = self.loss(val_color, val_y1)
-                val_shape_loss = self.loss(val_shape, val_y2)
+                val_color_loss = self.criterion.color_loss(val_color, val_y1, config.classes)
+                val_shape_loss = self.criterion.shape_loss(val_shape, val_y2, 2)
                 val_loss = val_color_loss + val_shape_loss
                 interval_valloss += val_loss.item()
                 vc += val_color_loss.item()
@@ -89,8 +85,10 @@ class Trainer:
     
     def train(self, config, device, num_worker, weight_path=None):
         train_loader, val_loader = self.call_data_loader(config, num_worker)
-        color_model = LSTM_with_atten(config, inc=config.channels, start_fm=config.start_fm, num_cls=config.classes, embed_size=config.embed_size)
-        shape_model = LSTM_with_atten(config, inc=2, start_fm=config.start_fm, num_cls=2, embed_size=config.embed_size) 
+        model = LSTM_with_atten(config, inc=config.channels, 
+                    start_fm=config.start_fm, num_cls=config.classes, 
+                    embed_size=config.embed_size, lstm_use=None)
+        
         # (Initialize logging)
         logging.info(f'''Starting training:
             Epochs:          {config.epochs}
@@ -98,38 +96,33 @@ class Trainer:
             Training size:   {len(self.train_dst)}
             Validation size: {len(self.val_dst)}
         ''')
-        summary(color_model, input_size=(1, 3, 224, 224))
-        # 4. Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
-        optimizer = create_optimizer(color_model, config)
+        
+        optimizer = create_optimizer(model, config)
         scheduler = CosineWithRestarts(optimizer, t_max=10)
         #scheduler = CosineAnnealingLR(optimizer, T_max=config.t_max, eta_min=config.eta_min)
-        #if weight_path is not None:
-        #    model.load_state_dict(torch.load(weight_path, map_location=device))
+        if weight_path is not None:
+            model.load_state_dict(torch.load(weight_path, map_location=device))
         #if torch.cuda.device_count() > 1:
            # model = nn.DataParallel(model)
-        color_model.to(device)
-        shape_model.to(device)
+        model.to(device)
+
         global_step = 0
-        # 5. Begin training
         for epoch in range(1, config.epochs+1):
             interval_loss, colors, shapes = 0, 0, 0
-            color_model.train()
-            shape_model.train()
+            model.train()
             with tqdm(total=int(len(self.train_dst)/config.train_batch), desc=f'Epoch {epoch}/{config.epochs}') as pbar:
                 for x1, x2, y1, y2 in train_loader:
                     x1 = x1.to(device=device, dtype=torch.float32)
                     x2 = x2.to(device=device, dtype=torch.float32)
                     y_color = y1.to(device=device, dtype=torch.long)
-                    y_shape = y2.to(device=device, dtype=torch.long) #.unsqueeze(0)
+                    y_shape = y2.to(device=device, dtype=torch.long)
                     # predict
-                    pred_color_idx = color_model(x1)
-                    pred_shape_idx = shape_model(x2)
+                    pred_color_idx, pred_shape_idx = model(x1, x2)
                     #if global_step % 10==0:
                     #    utils.save_in_progress(x1, x2, global_step)
-                    #print(x2.max(), x2.min(), x1.max(), x1.min(), torch.sum(pred_label))
                     # loss update
-                    color_loss = self.loss(pred_color_idx, y_color)
-                    shape_loss = self.loss(pred_shape_idx, y_shape)
+                    color_loss = self.criterion.color_loss(pred_color_idx, y_color, config.classes)
+                    shape_loss = self.criterion.shape_loss(pred_shape_idx, y_shape, 2)
                     loss = color_loss + shape_loss
                     interval_loss += loss.item()
                     colors += color_loss.item()
@@ -141,7 +134,6 @@ class Trainer:
                     global_step += 1
                     pbar.set_postfix(**{'loss (batch)': loss.item()})
 
-                    # Evaluation round
                     if global_step % 10 == 0:
                         self.tfwriter.add_scalar('train/train_loss', interval_loss/10, global_step)
                         self.tfwriter.add_scalar('train/color_loss', colors/10, global_step)
@@ -150,12 +142,11 @@ class Trainer:
                         interval_loss, colors, shapes = 0.0, 0.0, 0.0
 
                     if global_step % config.val_interval == 0:
-                        self.validate(val_loader, color_model, shape_model, global_step, epoch, device)
-
+                        self.validate(config, val_loader, model, global_step, epoch, device)
+                        model.train()
             if config.save_checkpoint:
                 Path(config.ckpt_dir).mkdir(parents=True, exist_ok=True)
-                torch.save(color_model.state_dict(), config.ckpt_dir + "/"+ 'color_ckep{}.pth'.format(epoch))
-                torch.save(shape_model.state_dict(), config.ckpt_dir + "/"+ 'shape_ckep{}.pth'.format(epoch))
+                torch.save(model.state_dict(), config.ckpt_dir + "/"+ 'checkpoint_epoch{}.pth'.format(epoch))
                 logging.info(f'Checkpoint {epoch} saved!')
 
 
@@ -173,4 +164,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         logging.info('Saved interrupt')
         raise
-

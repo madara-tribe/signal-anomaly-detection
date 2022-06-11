@@ -43,12 +43,12 @@ class MetaDataLoader(data.Dataset):
         if clannel==3:
             x = cv2.imread(p)
             x = x.reshape(self.width, self.height, 3).astype(np.float32)
+            #x_img = cv2.cvtColor(x_img, cv2.COLOR_BGR2RGB)
             if self.valid:
                 x = np.flip(x)
         elif clannel==1:
             x = cv2.imread(p, 0)
             x = x.reshape(self.width, self.height, 1).astype(np.float32)
-            #x_img = cv2.cvtColor(x_img, cv2.COLOR_BGR2RGB)
         return x/255
         
     def __getitem__(self, index):
@@ -65,7 +65,6 @@ class MetaDataLoader(data.Dataset):
         
         x_meta = np.concatenate([x2, x3], 2)
         x_meta = torch.as_tensor(x_meta.reshape(2, self.width, self.height).copy()).float().contiguous()
-        #x_img = x_img.reshape(self.width, self.height, 3).copy()
         
         y1 = self.y1[index]
         y1 = torch.as_tensor(y1.copy())
@@ -75,4 +74,5 @@ class MetaDataLoader(data.Dataset):
         if self.transform is not None:
             x_img = self.transform(x_img)
         return x_img, x_meta, y1, y2
+
 
