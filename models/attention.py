@@ -13,17 +13,15 @@ def attention_net(lstm_output, final_state):
     return new_hidden_state
 
 class SelfAttention(nn.Module):
-    def __init__(self, lstm_dim, num_cls):
+    def __init__(self, lstm_dim):
         super(SelfAttention, self).__init__()
-        self.lstm_dim = lstm_dim *2
-        self.num_cls = num_cls
         self.attn_weight = nn.Sequential(
-            nn.Linear(lstm_dim *2, lstm_dim *2), 
-            nn.Tanh(),
-            nn.Linear(lstm_dim *2, lstm_dim *2)
+            nn.Linear(lstm_dim, lstm_dim), 
+            nn.ReLU(True),
+            nn.Linear(lstm_dim, lstm_dim)
         )
     def forward(self, lstm_output):
         attn_weight = self.attn_weight(lstm_output)
         attn_weight = F.softmax(attn_weight, dim=2)
-        feats = torch.cat([lstm_output, attn_weight], 2)
+        feats = torch.add(lstm_output, attn_weight)
         return feats.squeeze(0)

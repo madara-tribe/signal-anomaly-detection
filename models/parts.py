@@ -33,9 +33,8 @@ class CNNEncorder(nn.Module):
         self.maxpool3 = nn.MaxPool2d(kernel_size=2)
         #Convolution 4
         self.double_conv4 = double_conv(start_fm * 4, start_fm * 8)
-        
         self.maxpool4 = nn.MaxPool2d(kernel_size=2)
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
+        
         
     def forward(self, x):
         x = self.double_conv1(x)
@@ -48,8 +47,4 @@ class CNNEncorder(nn.Module):
         x = self.maxpool3(x)
 
         x = self.double_conv4(x)
-        x = self.maxpool4(x) # torch.Size([1, 512, 14, 14])
-        return self.avgpool(x) # torch.Size([1, 512, 1, 1])
-
-
-
+        return self.maxpool4(x) # torch.Size([1, 512, 14, 14])
