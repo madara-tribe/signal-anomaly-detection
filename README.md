@@ -1,5 +1,6 @@
 # CNN-LSTM_attention
 
+prototype and floppy
 
 <img width="1281" alt="スクリーンショット 2022-06-12 13 40 19" src="https://user-images.githubusercontent.com/48679574/173214699-0b9035d0-9dc8-47a0-ad13-e1869ef81978.png">
 
