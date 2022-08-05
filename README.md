@@ -38,7 +38,7 @@ Use 1dCNN+LSTM+Attention with Transformer like block. Transformer like block pre
 
 
 # References
-・[Metaformer](https://qiita.com/T-STAR/items/2c163665c26cde3cd995)
-・[Audio Data Augmentation](https://www.kaggle.com/code/hidehisaarai1213/rfcx-audio-data-augmentation-japanese-english)
-・[Anomaly Detection in Control Valves by 1d CNN-LSTM](https://confit.atlas.jp/guide/event-img/jsai2018/3Pin1-44/public/pdf?type=in)
-・[Architecture of the Hybrid 1D CNN + LSTM model for human activity recognition](https://www.researchgate.net/figure/Architecture-of-the-Hybrid-1D-CNN-LSTM-model-for-human-activity-recognition_fig4_343341551)
+- [Metaformer](https://qiita.com/T-STAR/items/2c163665c26cde3cd995)
+- [Audio Data Augmentation](https://www.kaggle.com/code/hidehisaarai1213/rfcx-audio-data-augmentation-japanese-english)
+- [Anomaly Detection in Control Valves by 1d CNN-LSTM](https://confit.atlas.jp/guide/event-img/jsai2018/3Pin1-44/public/pdf?type=in)
+- [Architecture of the Hybrid 1D CNN + LSTM model for human activity recognition](https://www.researchgate.net/figure/Architecture-of-the-Hybrid-1D-CNN-LSTM-model-for-human-activity-recognition_fig4_343341551)
