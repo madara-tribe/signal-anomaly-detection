@@ -1,5 +1,15 @@
+# Signal anomaly detection by 1dCNN+LSTM+Attention model
+
+# Abstract
+This is signal wav data anomaly detection.
+Use 1dCNN+LSTM+Attention 
 
 
+# Performance
+
+## data 
+
+<b>normal / anomaly</b>
 
 
 # References
