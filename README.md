@@ -7,8 +7,10 @@ Use 1dCNN+LSTM+Attention
 normal and anomaly pattern is private infomation but anomaly is litle more rough than normal
 
 
-# Network
+# Network with Transformer like
 
+
+- [Metaformer]
 
 # Performance
 
