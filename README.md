@@ -9,8 +9,11 @@ Use 1dCNN+LSTM+Attention
 
 ## data 
 
-<b>normal / anomaly</b>
+<b>normal</b>
 
+<img src="https://user-images.githubusercontent.com/48679574/182996152-2e5fbcbb-5e04-484f-b11c-9fe4716046b8.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996155-3039a0f9-fe4b-4c12-b5f7-43393028052f.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996157-c48a523b-4355-4b16-9b68-0f8b7d64468c.png" width="200px">
+
+<b>anomaly</b>
 
 # References
 ・[Anomaly Detection in Control Valves by 1d CNN-LSTM](https://confit.atlas.jp/guide/event-img/jsai2018/3Pin1-44/public/pdf?type=in)
