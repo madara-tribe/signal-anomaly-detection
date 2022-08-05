@@ -4,18 +4,27 @@
 This is signal wav data anomaly detection.
 Use 1dCNN+LSTM+Attention 
 
+normal and anomaly pattern is private infomation but anomaly is litle more rough than normal
+
+
+# Network
+
 
 # Performance
 
 ## data 
 
-<b>normal</b>
+<b>normal (not so rough)</b>
 
 <img src="https://user-images.githubusercontent.com/48679574/182996152-2e5fbcbb-5e04-484f-b11c-9fe4716046b8.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996155-3039a0f9-fe4b-4c12-b5f7-43393028052f.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996157-c48a523b-4355-4b16-9b68-0f8b7d64468c.png" width="200px">
 
-<b>anomaly</b>
+<b>anomaly (little more rough)</b>
 
 <img src="https://user-images.githubusercontent.com/48679574/182996527-747bc7f3-ad1a-4975-82e3-a113989d915c.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996531-6830f868-c9f8-42d9-bd61-e003a218ed61.png" width="200px"><img src="https://user-images.githubusercontent.com/48679574/182996532-4f7c2418-76ee-4ee6-b127-c6477b73a06f.png" width="200px">
+
+## result
+
+
 
 
 
