@@ -9,9 +9,9 @@ normal and anomaly pattern is private infomation but anomaly is litle more rough
 
 # Network with Transformer like
 
-<img src="https://user-images.githubusercontent.com/48679574/182999671-8caf89ef-adbc-46db-a6b2-e4a18fefd401.png" width="500px">
+<img src="https://user-images.githubusercontent.com/48679574/183011236-873540b5-6bf1-4d21-a5f3-5276f54d6ce7.png" width="500px">
 
-<b>Transformaer</b>
+<b>Transformer</b>
 
 <img src="https://user-images.githubusercontent.com/48679574/182999476-32ff629f-3317-4c8f-8532-4de67a1a02fe.png" width="700px">
 
