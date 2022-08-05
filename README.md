@@ -1,10 +1,4 @@
-# CNN-LSTM_attention
 
-<b>1dCNN + LSTM+ MultiheadAttention (no augmentation)</b>
-output 10 sigmoid, tstep = 4, c=30000
-bce + rmse loss
-
-<img width="650" alt="スクリーンショット 2022-07-30 16 28 28" src="https://user-images.githubusercontent.com/48679574/181880511-346277c9-552f-424b-b888-a6c5fe40ed15.png">
 
 
 
