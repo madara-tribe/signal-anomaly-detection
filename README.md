@@ -1,19 +1,22 @@
 # Signal anomaly detection by 1dCNN+LSTM+Attention model
 
 # Abstract
-This is signal wav data anomaly detection.
-Use 1dCNN+LSTM+Attention 
-
+This is signal wav data anomaly detection.  
 normal and anomaly pattern is private infomation but anomaly is litle more rough than normal
+
+Use 1dCNN+LSTM+Attention with Transformer like block. Transformer like block prevent overfitting.
+
+<b>Transformer</b>
+
+<img src="https://user-images.githubusercontent.com/48679574/182999476-32ff629f-3317-4c8f-8532-4de67a1a02fe.png" width="700px">
+
+
 
 
 # Network with Transformer like
 
 <img src="https://user-images.githubusercontent.com/48679574/183011236-873540b5-6bf1-4d21-a5f3-5276f54d6ce7.png" width="500px">
 
-<b>Transformer</b>
-
-<img src="https://user-images.githubusercontent.com/48679574/182999476-32ff629f-3317-4c8f-8532-4de67a1a02fe.png" width="700px">
 
 
 # Performance
