@@ -29,6 +29,8 @@ Use 1dCNN+LSTM+Attention with Transformer like block. Transformer like block pre
 
 ## result
 
+train images iare about 1200, test images is 200.
+
 <b>accuracy is 87.5%</b>
 
 <img width="451" alt="スクリーンショット 2022-08-07 20 16 54" src="https://user-images.githubusercontent.com/48679574/183288046-9c683637-914d-4d22-914c-01dd4b138943.png">
