@@ -23,6 +23,7 @@ class CNN1d_Transformer(nn.Module):
         self.fliner = nn.Linear(FINAL_DIM, 4)
         self.sfm = nn.Softmax(dim=1)
         self.logsfm = nn.LogSoftmax(dim=1)
+        
     def forward(self, x_):
         """
         This case input shape : (batch, channels=30000, tstep=4)
@@ -55,6 +56,9 @@ class CNN1d_Transformer(nn.Module):
             fts = self.cnn1d(xs_)
             ss.append(fts)
         x = torch.cat(ss, dim=1)
+        # Standardization
+        std, mean = torch.std_mean(x, dim=(1,2), unbiased=False, keepdim=True)
+        x = torch.div(x-mean, std)
         x = self.lstm(x)
         return x
 
